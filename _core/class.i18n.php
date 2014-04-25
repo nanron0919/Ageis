@@ -21,17 +21,12 @@ final class i18n
      */
     public static function line($namespace, $key = '', $escape = true)
     {
-        $_lang = '';
+        $active_language = self::_getActiveLanguage();
+        $lang = Loader::loadI18n($namespace, $active_language);
 
-        $filename = preg_replace('/(\/)?([\w-]+)$/', '$1lang.$2.php', $namespace);
-
-        $fullpath = APP_ROOT . sprintf(I18N_LANGUAGE_PATH, I18N_DEFAULT) . '/' . $filename;
-
-        if (true === is_readable($fullpath)) {
+        if (false === empty($lang)) {
             // default by a empty array
-            $lang = array();
-            include($fullpath);
-            self::$_cache_langs[$fullpath] = $lang;
+            self::$_cache_langs[$namespace] = $lang;
             $_lang = $lang;
             // get lang array
 
@@ -43,34 +38,6 @@ final class i18n
         }
 
         return $_lang;
-    }
-
-    /**
-     * fetch line from lang file
-     *
-     * @param string $key    - key
-     * @param array  $lang   - lang array
-     * @param bool   $escape - escape (true by default)
-     *
-     * @return mixed
-     */
-    private static function _line($key, $lang, $escape = true)
-    {
-        $escape = (true === is_bool($escape) ? $escape : true);
-        $result = '';
-
-        if (true === is_array($lang) && true === array_key_exists($key, $lang)) {
-            $result = $lang[$key];
-        }
-        else {
-            $result = $lang;
-        }
-
-        if (true === $escape) {
-            $result = self::escape($result);
-        }
-
-        return $result;
     }
 
     /**
@@ -97,35 +64,6 @@ final class i18n
         }
 
         return $lang;
-    }
-
-    /**
-     * set active language - set as const named I18N_ACTIVE
-     *
-     * @return null
-     */
-    public static function setActiveLanguage()
-    {
-        $mapping_func = array(
-            'domain'  => 'detectDomainLanguage',
-            'browser' => 'detectBroserLanguage'
-        );
-        $settings = self::parseOrderSetting();
-        $support_langs = self::getSupportLanguages();
-        $langs = array();
-
-        foreach ($mapping_func as $key => $value) {
-            $langs = array_merge($langs, call_user_func('self::' . $mapping_func[$key]));
-        }
-
-        $intersect_langs = array_intersect($langs, $support_langs);
-
-        if (false === empty($intersect_langs)) {
-            define('I18N_ACTIVE', $intersect_langs[0]);
-        }
-        else {
-            define('I18N_ACTIVE', I18N_DEFAULT);
-        }
     }
 
     /**
@@ -161,7 +99,7 @@ final class i18n
         $settings       = self::parseOrderSetting();
         $setting        = $settings['domain'];
         $langs          = array();
-        $hostname_parts = explode('.', HOSTNAME);
+        $hostname_parts = explode('.', Url::host());
 
         $map = array($hostname_parts[0], end($hostname_parts));
 
@@ -181,17 +119,16 @@ final class i18n
      */
     public static function parseOrderSetting()
     {
-        $order   = explode(';', I18N_DETECT_ORDER);
+        $config  = Config::i18n();
+        $order   = $config->detect_order;
         $mapping = array();
 
         foreach ($order as $o) {
-            $match = preg_match_all('/\w+-?\w+/', $o, $matches);
-            $matches = end($matches);
-
-            $mapping[$matches[0]] = array();
-
-            for ($i = 1; $i < count($matches); $i+=2) {
-                $mapping[$matches[0]][$matches[$i]] = $matches[$i + 1];
+            if ('domain' === $o) {
+                $mapping[$o] = (object) $config->locale_map;
+            }
+            else {
+                $mapping[$o] = new stdClass;
             }
         }
 
@@ -207,13 +144,76 @@ final class i18n
     {
         $langs = array();
 
-        foreach (glob(APP_ROOT . '/_i18n/*', GLOB_ONLYDIR) as $item) {
-            $items           = explode('/', $item);
-            $dirname         = end($items);
+        foreach (glob(Config::i18n()->path . '/*', GLOB_ONLYDIR) as $item) {
+            $items   = explode('/', $item);
+            $dirname = end($items);
             $langs[] = $dirname;
         }
 
         return $langs;
+    }
+
+    /////////////////////
+    // private methods //
+    /////////////////////
+
+    /**
+     * get active language - get active language
+     *
+     * @return string
+     */
+    private static function _getActiveLanguage()
+    {
+        $config = Config::i18n();
+
+        $mapping_func  = array(
+            'domain'  => 'detectDomainLanguage',
+            'browser' => 'detectBroserLanguage'
+        );
+        $settings      = self::parseOrderSetting();
+        $support_langs = self::getSupportLanguages();
+        $active_language = $config->default;
+        $langs = array();
+
+        foreach ($mapping_func as $key => $value) {
+            $langs = array_merge($langs, call_user_func('self::' . $mapping_func[$key]));
+        }
+
+        $intersect_langs = array_intersect($langs, $support_langs);
+
+        if (false === empty($intersect_langs)) {
+            $active_language = $intersect_langs[0];
+        }
+
+        return $active_language;
+    }
+
+    /**
+     * fetch line from lang file
+     *
+     * @param string $key    - key
+     * @param array  $lang   - lang array
+     * @param bool   $escape - escape (true by default)
+     *
+     * @return mixed
+     */
+    private static function _line($key, $lang, $escape = true)
+    {
+        $escape = (true === is_bool($escape) ? $escape : true);
+        $result = '';
+
+        if (true === is_array($lang) && true === array_key_exists($key, $lang)) {
+            $result = $lang[$key];
+        }
+        else {
+            $result = $lang;
+        }
+
+        if (true === $escape) {
+            $result = self::escape($result);
+        }
+
+        return $result;
     }
 }
 ?>
