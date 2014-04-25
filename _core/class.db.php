@@ -8,12 +8,15 @@
  */
 class DB
 {
+    public $provider;
     public $mysqli;
 
     /**
      * costructor
+     *
+     * @param object $config - database config
      */
-    public function __construct()
+    public function __construct($config)
     {
         $this->mysqli = new mysqli(DATABASE_LOCATION, DATABASE_USER, DATABASE_PASSWORD, DATABASE_DB_NAME);
         $this->mysqli->set_charset(DATABASE_CHARSET);
