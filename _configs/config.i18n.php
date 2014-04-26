@@ -3,6 +3,10 @@
  * i18n setting
  */
 return array(
+    /////////////////////////////////////////////
+    // essential settings below, do not remove //
+    /////////////////////////////////////////////
+
     /**
      * setting language file where is located
      */

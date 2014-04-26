@@ -3,6 +3,10 @@
  * database setting
  */
 return array(
+    /////////////////////////////////////////////
+    // essential settings below, do not remove //
+    /////////////////////////////////////////////
+
     // setting by env
     'development' => array(
         'default' => array(

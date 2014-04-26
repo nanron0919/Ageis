@@ -5,6 +5,10 @@
 
 // config set is group by host and the default must be exist
 $configs = array(
+    /////////////////////////////////////////////
+    // essential settings below, do not remove //
+    /////////////////////////////////////////////
+
     'default' => array(
         'env'              => 'development',
         'debug'            => true,

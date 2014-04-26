@@ -3,6 +3,10 @@
  * database exception
  */
 return array(
+    /////////////////////////////////////////////
+    // essential settings below, do not remove //
+    /////////////////////////////////////////////
+
     'initialize' => array(
         'ex1001' => array(
             'code'    => 1001,
@@ -45,6 +49,17 @@ return array(
         'ex4003' => array(
             'code'    => 4003,
             'message' => 'Not a model.'
+        ),
+    ),
+    // action exceptions are for controller or view rendering
+    'action' => array(
+        'ex5001' => array(
+            'code'    => 5001,
+            'message' => 'View (%s) is not existing.'
+        ),
+        'ex5002' => array(
+            'code'    => 5002,
+            'message' => 'Module (%s) is not existing.'
         ),
     ),
 );
