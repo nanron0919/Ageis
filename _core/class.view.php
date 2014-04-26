@@ -44,8 +44,8 @@ final class View
 
         }
         else {
-            // TODO: throw exception.
-            Application::debug('完全沒有畫面');
+            $ex = Config::exception()->action->ex5001;
+            throw new ActionException($ex, $view_name);
         }
     }
 }
