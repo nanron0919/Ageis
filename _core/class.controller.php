@@ -10,9 +10,9 @@ abstract class Controller
 {
     const DEFAULT_METHOD = 'index';
 
-    public $route;
-    public $request_vars = array();
-    public $env;
+    protected $route;
+    protected $request_vars = array();
+    protected $env;
 
     /**
      * constructor
@@ -36,7 +36,7 @@ abstract class Controller
             'params' => $this->route->params
         );
 
-        $request_vars = array_merge($request_vars, $this->_getRequest());
+        $request_vars = Converter::arrayToObject(array_merge($request_vars, $this->_getRequest()));
 
         $active_method = (false === empty($this->route->params['method'])
             ? $this->route->params['method']
