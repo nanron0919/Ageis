@@ -11,20 +11,22 @@ final class Mysql extends Database_Driver
     /**
      * connection - connection
      *
-     * @param object $config - config
-     *
-     * @return null
+     * @return object - connection
      */
-    public function connection($config)
+    public function connection()
     {
-        $this->connection = new mysqli($config->host, $config->user, $config->password, $config->database);
+        if (false === isset($this->connection)) {
+            $this->connection = new mysqli($this->config->host, $this->config->user, $this->config->password, $this->config->database);
 
-        if (0 < $this->connection->connect_errno) {
-            // TODO: throw an exception
+            if (0 < $this->connection->connect_errno) {
+                // TODO: throw an exception
+            }
+
+            $this->connection->set_charset($this->config->charset);
+            $this->connection->query(sprintf('set timezone SET timezone = "%s"', $this->config->timezone));
         }
 
-        $this->connection->set_charset($config->charset);
-        $this->connection->query(sprintf('set timezone SET timezone = "%s"', $config->timezone));
+        return $this->connection;
     }
 
     /**
