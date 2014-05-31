@@ -13,9 +13,19 @@ class Url
      *
      * @return array
      */
+    public static function requestUri()
+    {
+        return $_SERVER['REQUEST_URI'];
+    }
+
+    /**
+     * segment - segments for url
+     *
+     * @return array
+     */
     public static function segment()
     {
-        preg_match_all('/\/(?<segment>\w+)/', $_SERVER['REQUEST_URI'], $matches);
+        preg_match_all('/\/(?<segment>\w+)/', self::requestUri(), $matches);
         return $matches['segment'];
     }
 
@@ -36,7 +46,7 @@ class Url
      */
     public static function scheme()
     {
-        return (80 === $_SERVER['SERVER_PORT'] ? 'http' : 'https');
+        return (80 === (int)$_SERVER['SERVER_PORT'] ? 'http' : 'https');
     }
 
     /**
@@ -76,7 +86,7 @@ class Url
      *
      * @return string
      */
-    public static function bindAbsoulte($val)
+    public static function bindAbsolute($val)
     {
         return sprintf('%s://%s/%s', self::scheme(), self::host(), $val);
     }
