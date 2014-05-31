@@ -37,7 +37,7 @@ final class i18n
             }
         }
 
-        return $_lang;
+        return Converter::arrayToObject($_lang);
     }
 
     /**
