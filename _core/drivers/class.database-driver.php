@@ -9,6 +9,7 @@
 abstract class Database_Driver
 {
     protected $connection;
+    protected $config;
 
     /**
      * costructor
@@ -18,19 +19,22 @@ abstract class Database_Driver
     public function __construct($config = null)
     {
         if (false === empty($config)) {
+            $this->config = $config;
+
             // build connection
-            $this->connection($config);
+            $this->connection();
+        }
+        else {
+            // TODO: throw an excepion
         }
     }
 
     /**
      * connection - connection
      *
-     * @param object $config - config
-     *
      * @return null
      */
-    abstract public function connection($config);
+    abstract public function connection();
 
     /**
      * disconnect - disconnect
