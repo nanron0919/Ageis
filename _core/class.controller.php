@@ -23,6 +23,13 @@ abstract class Controller
     {
         $this->route = $route;
         $this->env = Config::env();
+
+        $caching_content = View::getCache(Url::requestUri());
+
+        if (false === empty($caching_content)) {
+            HttpResponse::html($caching_content);
+            exit;
+        }
     }
 
     /**
@@ -75,7 +82,7 @@ abstract class Controller
 
         foreach ($map as $key => $request) {
             foreach ($request as $name => $val) {
-                $request_vars[$key][$name] = call_user_func('Input::' . $key, $name);
+                $request_vars[$key][$name] = call_user_func('HttpRequest::' . $key, $name);
             }
         }
 
