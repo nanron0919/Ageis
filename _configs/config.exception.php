@@ -1,16 +1,16 @@
 <?php
 /**
- * database exception
+ * config exception
  */
 return array(
     /////////////////////////////////////////////
     // essential settings below, do not remove //
     /////////////////////////////////////////////
 
-    'initialize' => array(
+    'application' => array(
         'ex1001' => array(
             'code'    => 1001,
-            'message' => 'File is not existing.'
+            'message' => 'File/Directory is not existing.'
         ),
         'ex1002' => array(
             'code'    => 1002,
@@ -60,6 +60,16 @@ return array(
         'ex5002' => array(
             'code'    => 5002,
             'message' => 'Module (%s) is not existing.'
+        ),
+    ),
+    'upload' => array(
+        'ex6001' => array(
+            'code'    => 6001,
+            'message' => 'Uploaded file is not existing.'
+        ),
+        'ex6002' => array(
+            'code'    => 6002,
+            'message' => 'Uploaded file is not acceptable.'
         ),
     ),
 );
