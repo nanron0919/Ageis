@@ -23,8 +23,7 @@ abstract class BaseException extends Exception
 
         // always returns 500
         http_response_code(500);
-        // TODO: redirect to error page
-        // Http::redirect()
+
         set_exception_handler(array('BaseException', 'errorHandler'));
     }
 
@@ -37,8 +36,18 @@ abstract class BaseException extends Exception
      */
     public static function errorHandler($ex)
     {
-        var_dump($ex);
-        // TODO: logging
+        $logger = new Logger;
+        $content = sprintf(
+            '(%s) File: (%s), Line (%s): %s',
+            $ex->getCode(),
+            $ex->getFile(),
+            $ex->getLine(),
+            $ex->getMessage()
+        );
+        $content .= "\n" . $ex->getTraceAsString();
+        $logger->notice($content);
+
+        // TODO: redirect to error page
     }
 }
 ?>
