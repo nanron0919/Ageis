@@ -87,7 +87,7 @@ final class Session
             mkdir($config->files);
         }
 
-        session_set_cookie_params($config->lifetime, $config->files, $config->path, $config->secure);
+        session_save_path($config->files);
     }
 }
 ?>
