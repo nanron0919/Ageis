@@ -26,10 +26,6 @@ abstract class Model extends Builder_Select
      */
     protected $env;
     protected $exception;
-    /**
-     * this class name
-     */
-    protected $class_name;
 
     /**
      * db connection
@@ -66,10 +62,9 @@ abstract class Model extends Builder_Select
      */
     public function __construct()
     {
-        $this->env            = Config::env();
-        $this->exception      = Config::exception();
-        $this->class_name     = get_class();
-        $this->fill_fields    = array('*');
+        $this->env         = Config::env();
+        $this->exception   = Config::exception();
+        $this->fill_fields = array('*');
 
         $this->checkSettings();
 
@@ -163,18 +158,18 @@ abstract class Model extends Builder_Select
     /**
      * hasA - has a object
      *
-     * @param string $model_name - model object
-     * @param string $srcKey     - which field as source key
-     * @param string $destKey    - which field as destination key
-     * @param string $name       - hash key
-     * @param array  $filter     - filter
+     * @param string $model   - model object
+     * @param string $srcKey  - which field as source key
+     * @param string $destKey - which field as destination key
+     * @param string $name    - hash key
+     * @param array  $filter  - filter
      *
      * @return this
      */
-    public function hasA($model_name, $srcKey, $destKey, $name, $filter = array())
+    public function hasA($model, $srcKey, $destKey, $name, $filter = array())
     {
-        if (true === class_exists($model_name)) {
-            $this->hasA[$name] = array($model_name, $srcKey, $destKey, $filter);
+        if (true === $this->equals($model)) {
+            $this->hasA[$name] = array($model, $srcKey, $destKey, $filter);
         }
         else {
             throw new ModelException($this->exception->model->ex4003);
@@ -204,7 +199,8 @@ abstract class Model extends Builder_Select
             $affect_rows = $this->update($this->store_fields, $where);
         }
         else {
-            $affect_rows = $this->insert($this->store_fields);
+            $this->insert($this->store_fields);
+            $affect_rows = 1;
         }
 
         // clear
@@ -214,15 +210,28 @@ abstract class Model extends Builder_Select
     }
 
     /**
+     * updating - execute before update
+     *
+     * @return null
+     */
+    protected function updating()
+    {
+        // do something before update
+    }
+
+    /**
      * update - update an entry
      *
-     * @param array $fields - hash array for updaeing fields
+     * @param array $fields - hash array for updating fields
      * @param array $where  - hash array for conditions
      *
      * @return int
      */
     protected function update($fields, $where)
     {
+        // do it at begining
+        $this->updating();
+
         $update = new Builder_Update;
 
         $temp_update = $update->from($this->table);
@@ -240,7 +249,30 @@ abstract class Model extends Builder_Select
 
         $update_result = call_user_func_array(array($this->db, 'query'), $result);
 
+        // do it at the end
+        $this->updated();
+
         return $update_result;
+    }
+
+    /**
+     * updated - execute after update
+     *
+     * @return null
+     */
+    protected function updated()
+    {
+        // do something after update
+    }
+
+    /**
+     * inserting - execute before insert
+     *
+     * @return null
+     */
+    protected function inserting()
+    {
+        // do something before insert
     }
 
     /**
@@ -252,6 +284,9 @@ abstract class Model extends Builder_Select
      */
     protected function insert($fields)
     {
+        // do it before insert
+        $this->inserting();
+
         $insert = new Builder_Insert;
 
         $temp_insert = $insert->from($this->table);
@@ -264,7 +299,20 @@ abstract class Model extends Builder_Select
 
         $insert_result = call_user_func_array(array($this->db, 'query'), $result);
 
+        // do it after insert
+        $this->inserted();
+
         return $insert_result;
+    }
+
+    /**
+     * inserted - execute after insert
+     *
+     * @return null
+     */
+    protected function inserted()
+    {
+        // do something after insert
     }
 
     /**
@@ -276,10 +324,7 @@ abstract class Model extends Builder_Select
      */
     public function equals($model)
     {
-        return (true === is_object($model) &&
-            false === empty($model->class_name) &&
-            $this->class_name === $model->class_name
-        );
+        return (true === is_object($model) && get_class() === get_parent_class($model));
     }
 
     ////////////
@@ -335,6 +380,28 @@ abstract class Model extends Builder_Select
         }
         else {
             throw new DataTypeException($this->exception->database->ex3001);
+        }
+    }
+
+    ////////////
+    // getter //
+    ////////////
+
+    /**
+     * __get - set field and value for the new entry
+     *
+     * @param string $name - field's name
+     * @param mixed  $val  - value
+     *
+     * @return mixed
+     */
+    public function __get($name)
+    {
+        if (true === array_key_exists($name, $this->fields)) {
+            return $this->store_fields[$name];
+        }
+        else {
+            throw new DataTypeException($this->exception->datatype->$error);
         }
     }
 
