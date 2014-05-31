@@ -33,7 +33,7 @@ class Route
      */
     public function findMatchRoute()
     {
-        $_route = array(
+        $_route = (object) array(
             'controller' => ''
         );
 
@@ -83,7 +83,7 @@ class Route
                 // TODO: need to take time to refactoring as soon as possible!!
                 $route->regex = preg_replace('/(?P<l_bracket>\()?(?P<slash>\/)?\:(?P<group>\w+)(?P<r_bracket>\))?/i', '$2$1?P<$3>\w+$4', $route->pattern);
                 $route->regex = str_replace('/(', '\/?(', $route->regex);
-                $route->regex = '/^' . $name . '\/' . str_replace(')', ')?', $route->regex) . '/';
+                $route->regex = '/^' . $name . '\/?' . str_replace(')', ')?', $route->regex) . '/';
                 $route->regex = preg_replace('|(\/)([?]P<\w+>.*)(\\\/[?])|', '$1($2)$3', $route->regex);
 
                 preg_match_all('/\:\w+/', $route->pattern, $matches);
