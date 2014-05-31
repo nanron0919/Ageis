@@ -2,6 +2,8 @@
 .DS_Store
 Desktop.ini
 _sessions
+_log
+_tmp
 
 # Thumbnail cache files
 ._*
