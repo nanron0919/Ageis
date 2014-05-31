@@ -97,7 +97,7 @@ class Loader
             throw new ActionException(Config::exception()->action->ex5002, $class_name);
         }
 
-        return $class_name;
+        return new $class_name;
     }
 
     /**
@@ -175,7 +175,7 @@ class Loader
      * @param string $dir  - directory (without trailing slash)
      * @param bool   $once - require once
      *
-     * @return mixed
+     * @return array - files
      */
     private static function _load($fullpath, $once = true)
     {
@@ -186,6 +186,7 @@ class Loader
                 $files = self::_globRecursive($fullpath);
 
                 foreach ($files as $file) {
+                    call_user_func_array(array('self', '_load'), array($file, $once));
                     $return[basename($file)] = require_once($file);
                 }
             }
