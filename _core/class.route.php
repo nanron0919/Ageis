@@ -80,18 +80,35 @@ class Route
             );
 
             if (false === empty($route->pattern)) {
-                // TODO: need to take time to refactoring as soon as possible!!
-                $route->regex = preg_replace('/(?P<l_bracket>\()?(?P<slash>\/)?\:(?P<group>\w+)(?P<r_bracket>\))?/i', '$2$1?P<$3>\w+$4', $route->pattern);
-                $route->regex = str_replace('/(', '\/?(', $route->regex);
-                $route->regex = '/^' . $name . '\/?' . str_replace(')', ')?', $route->regex) . '/';
-                $route->regex = preg_replace('|(\/)([?]P<\w+>.*)(\\\/[?])|', '$1($2)$3', $route->regex);
+                // replace ) as )?
+                $route->regex = str_replace(')', ')?', $route->pattern);
+                $pattern = '/(([(]?\/?)([:](\w+)))/i';
+                preg_match_all($pattern, $route->regex, $matches);
+                $strpos = 0;
 
-                preg_match_all('/\:\w+/', $route->pattern, $matches);
+                foreach ($matches[3] as $index => $match) {
+                    $strpos = strpos($route->regex, $match, $strpos);
+                    $wrapper = $matches[2][$index];
+                    $is_optional = ('(/' === $wrapper);
+                    $param_name = $matches[4][$index];
 
-                foreach ($matches[0] as $val) {
-                    $val = str_replace(':', '', $val);
-                    $route->params[$val] = '';
+                    $search = $wrapper . $match;
+
+                    if (true === $is_optional) {
+                        $replace = sprintf('(\/?(?P<%s>\w+)', $param_name);
+                    }
+                    else {
+                        $replace = sprintf('%s(?P<%s>\w+)', $wrapper, $param_name);
+                    }
+
+                    $route->regex = str_replace($search, $replace, $route->regex);
+
+                    // setting route parameters
+                    $route->params[$param_name] = '';
                 }
+
+                // complete regex pattern
+                $route->regex = '/^' . $name . '\/?' . $route->regex . '/';
             }
             else {
                 $route->regex = '/^$/';
