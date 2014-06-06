@@ -9,22 +9,30 @@ require_once FRAMEWORK_ROOT . '/_core/sql-builder/class.builder-select.php';
  */
 abstract class Model extends Builder_Select
 {
+    /**
+     * consts of field
+     */
     const FIELD_TYPE     = 0;
     const FIELD_RANGE    = 1;
     const FIELD_REQUIRED = 2;
 
+    /**
+     * consts of range
+     */
     const RANGE_MAX  = 0;
     const RANGE_MIN  = 1;
 
+    /**
+     * consts of what it has
+     */
     const HAS_MODEL    = 0;
     const HAS_SRC_KEY  = 1;
     const HAS_DEST_KEY = 2;
     const HAS_FILTER   = 3;
 
     /**
-     * store env config
+     * exception config
      */
-    protected $env;
     protected $exception;
 
     /**
@@ -45,7 +53,8 @@ abstract class Model extends Builder_Select
     protected $store_fields  = array();  // the fields that inserted
     protected $hasA          = array();  // set what the model that has own
     protected $fill_fields   = array();  // default return anyway (declare at parent class)
-    protected $ingore_fields = array();  // dosen't return anyway
+    protected $ingore_fields = array();  // dosen't return from query anyway
+    protected $ingore_update = array();  // dosen't update anyway
 
     /**
      * helper objects
@@ -59,16 +68,49 @@ abstract class Model extends Builder_Select
 
     /**
      * costructor
+     *
+     * @param object - db driver
      */
-    public function __construct()
+    public function __construct($db_driver)
     {
-        $this->env         = Config::env();
+        // $this->env         = Config::env();
         $this->exception   = Config::exception();
-        $this->fill_fields = array('*');
+        $this->fill_fields = array($this->table . '.*');
 
+        // check required settings are ready
         $this->checkSettings();
 
+        // setting db connection by driver
+        $this->db = $db_driver;
+
         parent::__construct();
+    }
+
+    /**
+     * getAttribute - get attribute
+     *
+     * @param string $name - attribute name
+     *
+     * @return mixed - value of attibute
+     */
+    public function getAttribute($name)
+    {
+        return (true === property_exists($this, $name) ? $this->$name : '');
+    }
+
+    /**
+     * appendField - append field
+     *
+     * @param string $field - field name
+     *
+     * @return object - this
+     */
+    public function appendField($name)
+    {
+        $this->fill_fields = (true === is_array($this->fill_fields) ? $this->fill_fields : array());
+        $this->fill_fields[] = $name;
+
+        return $this;
     }
 
     ////////////////////////
@@ -96,7 +138,7 @@ abstract class Model extends Builder_Select
      */
     public function get()
     {
-        return $this->fetchResult($this->from($this->table));
+        return $this->fetchResult($this);
     }
 
     /**
@@ -106,8 +148,8 @@ abstract class Model extends Builder_Select
      */
     public function first()
     {
-        $rows = $this->fetchResult($this->from($this->table)->limit(0, 1));
-        $row = array();
+        $rows = $this->fetchResult($this->limit(0, 1));
+        $row = new stdClass;
 
         if (0 < count($rows)) {
             $row = $rows[0];
@@ -117,18 +159,36 @@ abstract class Model extends Builder_Select
     }
 
     /**
+     * count - fetch count of result
+     *
+     * @return int
+     */
+    public function count()
+    {
+        $field = sprintf('COUNT(%s) AS cnt', $this->primary_key);
+        $result = call_user_func_array(
+            array($this->db, 'query'),
+            $this->field($field, true)->from($this->table)->build()
+        );
+        return (int) (false === empty($result[0]->cnt) ? $result[0]->cnt : 0);
+    }
+
+    /**
      * fetchResult - fetch result
      *
      * @param object $sql_builder - builder
      *
-     * @return array
+     * @return object
      */
     protected function fetchResult($sql_builder)
     {
-        $result = call_user_func_array(array($this->db, 'query'), $sql_builder->build());
+        $result = call_user_func_array(
+            array($this->db, 'query'),
+            $sql_builder->from($this->table)->build()
+        );
         $result = $this->getHasA($result);
 
-        return $this->ingoreFields($result);
+        return Converter::arrayToObject(false !== $result ? $this->ingoreFields($result) : new stdClass);
     }
 
     /**
@@ -183,30 +243,62 @@ abstract class Model extends Builder_Select
     /////////////////
 
     /**
+     * saving - execute before save
+     *
+     * @return null
+     */
+    protected function saving()
+    {
+        // do something before save
+    }
+
+    /**
      * save - insert a new entry/update for this table
      *
      * @return int - affect rows
      */
     public function save()
     {
+        // execute before save
+        $this->saving();
+
         $affect_rows = 0;
+        $key_value = '';
 
         if (false === empty($this->store_fields[$this->primary_key])) {
             $where = array(
                 $this->primary_key => array($this->store_fields[$this->primary_key])
             );
+            // temporary save value of primary key
+            $key_value = $where[$this->primary_key];
             unset($this->store_fields[$this->primary_key]);
             $affect_rows = $this->update($this->store_fields, $where);
+
+            // set back value of primary key
+            $this->$$this->primary_key = $key_value;
         }
         else {
             $this->insert($this->store_fields);
             $affect_rows = 1;
         }
 
+        // execute after save
+        $this->saved();
+
         // clear
         $this->store_fields = array();
 
         return $affect_rows;
+    }
+
+    /**
+     * saved - execute after save
+     *
+     * @return null
+     */
+    protected function saved()
+    {
+        // do something after save
     }
 
     /**
@@ -237,7 +329,10 @@ abstract class Model extends Builder_Select
         $temp_update = $update->from($this->table);
 
         foreach ($fields as $key => $value) {
-            $temp_update = $temp_update->field($key, $value);
+            // pass by ignore updating fields
+            if (false === array_key_exists($key, $this->ingore_update)) {
+                $temp_update = $temp_update->field($key, $value);
+            }
         }
 
         foreach ($where as $key => $condition) {
@@ -438,19 +533,19 @@ abstract class Model extends Builder_Select
     protected function getHasA($result)
     {
         foreach ($this->hasA as $key => $has) {
-            $model_name = $has[self::HAS_MODEL];
+            $model = $has[self::HAS_MODEL];
             $filter = $has[self::HAS_FILTER];
 
             foreach ($result as &$row) {
-                $model = $this->buildAssocModel($model_name, $filter);
+                $model = $this->buildAssocModel($model, $filter);
                 $src_key  = $has[self::HAS_SRC_KEY];
                 $dest_key = $has[self::HAS_DEST_KEY];
 
                 if (false === empty($row->$src_key)) {
                     $row->$key = $model
-                        ->addIngoreFields(array($dest_key))
-                        ->where($dest_key, $row->$src_key)
-                        ->get();
+                            ->addIngoreFields(array($dest_key))
+                            ->where($dest_key, $row->$src_key)
+                            ->get();
                 }
                 else {
                     $row->$key = array();
@@ -464,21 +559,18 @@ abstract class Model extends Builder_Select
     /**
      * buildAssocModel - build an associate model
      *
-     * @param object $result - result
+     * @param object $model  - model
+     * @param array  $filter - filter
      *
      * @return object
      */
-    protected function buildAssocModel($model_name, $filter)
+    protected function buildAssocModel($model, $filter)
     {
-        $model = new $model_name;
-
         foreach ($filter as $row) {
             $model->where($row[0], $row[1]);
         }
 
         return $model;
     }
-
-
 }
 ?>
