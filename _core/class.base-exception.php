@@ -47,6 +47,10 @@ abstract class BaseException extends Exception
         $content .= "\n" . $ex->getTraceAsString();
         $logger->notice($content);
 
+        if ('production' !== Application::getEnv()) {
+            echo '<pre>' . $content . '</pre>';
+        }
+
         // TODO: redirect to error page
     }
 }
