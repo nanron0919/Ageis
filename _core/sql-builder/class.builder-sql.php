@@ -159,13 +159,17 @@ abstract class Builder_SQL
     /**
      * field - set field
      *
-     * @param string $field - field name
+     * @param string $field  - field name
+     * @param bool   $escape - escape
      *
      * @return object - this
      */
-    public function field($field)
+    public function field($field, $escape = false)
     {
-        $field = $this->wrapByGraveAccent($field);
+        if (false === $escape) {
+            $field = $this->wrapByGraveAccent($field);
+        }
+
         $this->temp_sql_array[$this->sections->field][] = $field;
 
         return $this;
@@ -281,7 +285,7 @@ abstract class Builder_SQL
 
             foreach ($sql_setting as $row) {
                 $this->temp_sql_statement_array[$this->sections->join] .=
-                    sprintf('%s %s.%s = %s ', $row[0], $row[1], $row[2], $row[3]);
+                    sprintf('%s %s ON %s.%s = %s ', $row[0], $row[1], $row[1], $row[2], $row[3]);
             }
         }
         else {
