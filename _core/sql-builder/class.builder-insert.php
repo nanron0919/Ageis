@@ -13,17 +13,21 @@ class Builder_Insert extends Builder_SQL
     /**
      * field - set field
      *
-     * @param string $field - field name
+     * @param string $field  - field name
+     * @param bool   $escape - escape
      *
      * @return object - this
      */
-    public function field($field)
+    public function field($field, $escape = false)
     {
         $args  = func_get_args();
         $value = (true === isset($args[1]) ? $args[1] : '');
         $name  = $this->setValue($value);
 
-        $field = $this->wrapByGraveAccent($field);
+        if (false === $escape) {
+            $field = $this->wrapByGraveAccent($field);
+        }
+
         $this->temp_sql_array[$this->sections->field][$name] = $field;
 
         return $this;
