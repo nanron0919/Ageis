@@ -6,7 +6,7 @@
 /**
  * class database driver
  */
-abstract class Database_Driver
+abstract class DatabaseDriver
 {
     protected $connection;
     protected $config;

@@ -6,7 +6,7 @@
 /**
  * class mysql
  */
-final class Mysql extends Database_Driver
+final class Mysql extends DatabaseDriver
 {
     /**
      * connection - connection
