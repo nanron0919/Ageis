@@ -22,7 +22,7 @@ final class Application
     }
 
     /**
-     * run application
+     * run - run application
      *
      * @return null
      */
@@ -43,7 +43,27 @@ final class Application
     }
 
     /**
-     * debug
+     * loadRoute - load route
+     *
+     * @return null
+     */
+    public function loadRoute()
+    {
+        $this->route->findMatchRoute();
+    }
+
+    /**
+     * getEnv - get environment
+     *
+     * @return string - enviroment
+     */
+    public static function getEnv()
+    {
+        return Config::env()->env;
+    }
+
+    /**
+     * debug - debug
      *
      * @param mixed $var - variable
      *
@@ -58,16 +78,6 @@ final class Application
             var_dump($var);
             echo '</pre>';
         }
-    }
-
-    /**
-     * load route
-     *
-     * @return null
-     */
-    public function loadRoute()
-    {
-        $this->route->findMatchRoute();
     }
 
 }
