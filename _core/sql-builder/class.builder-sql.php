@@ -211,7 +211,7 @@ abstract class Builder_SQL
         // build all section
         foreach ($this->sequence as $key => $item) {
             call_user_func_array(array($this, 'build' . ucfirst($key)) , array());
-        };
+        }
 
         $sql = implode(' ', $this->temp_sql_statement_array);
         $result = array(
