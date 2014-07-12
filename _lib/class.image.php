@@ -12,13 +12,14 @@ class Image
     const ORIENTATION_PORTRAIT  = 'portrait';
 
     public $image;
+    public $basename;
     public $image_type;
-    public $map_extensions = array(
+    public $extension;
+    protected $map_extensions = array(
         IMAGETYPE_JPEG => 'jpg',
         IMAGETYPE_GIF  => 'gif',
         IMAGETYPE_PNG  => 'png'
     );
-    public $extension;
 
     /**
      * load image
@@ -32,18 +33,17 @@ class Image
         if (is_readable($filename) && is_file($filename)) {
             $image_info = getimagesize($filename);
             $this->image_type = $image_info[2];
-            $this->extension  = $this->map_extensions[$this->image_type];
+            $this->extension = $this->map_extensions[$this->image_type];
+            $basename = basename($filename);
+            $this->basename = preg_replace('/(.*)\.\w{1,4}$/', '$1', $basename);
 
             if ($this->image_type == IMAGETYPE_JPEG) {
-
                 $this->image = imagecreatefromjpeg($filename);
             }
             else if ($this->image_type == IMAGETYPE_GIF) {
-
                 $this->image = imagecreatefromgif($filename);
             }
             else if ($this->image_type == IMAGETYPE_PNG) {
-
                 $this->image = imagecreatefrompng($filename);
             }
         }
@@ -64,24 +64,19 @@ class Image
         $dir = dirname($filename);
 
         if (!is_dir($dir)) {
-            mkdir($dir, 0777);
+            mkdir($dir, 0777, true);
         }
 
         if (isset($this->image)) {
-
             if ($this->image_type == IMAGETYPE_JPEG) {
-
                 imagejpeg($this->image, $filename, $compression);
             }
             elseif ($this->image_type == IMAGETYPE_GIF) {
-
                 imagegif($this->image, $filename);
             }
             elseif ($this->image_type == IMAGETYPE_PNG) {
-
                 imagepng($this->image, $filename);
             }
-
         }
 
         return $this;
@@ -97,15 +92,12 @@ class Image
         if (isset($this->image)) {
 
             if ($this->image_type == IMAGETYPE_JPEG) {    // 2
-
                 imagejpeg($this->image);
             }
             elseif ($this->image_type == IMAGETYPE_GIF) { // 1
-
                 imagegif($this->image);
             }
             elseif ($this->image_type == IMAGETYPE_PNG) { // 3
-
                 imagepng($this->image);
             }
         }
