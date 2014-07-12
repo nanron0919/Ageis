@@ -46,7 +46,7 @@ class Uploader
             $new_file = $app_tmp_root . '/' . $filename;
 
             if (true === File::move($old_file, $new_file)) {
-                $upload_file_name = sprintf('%s/%s', $filter->folder, $filename);
+                $upload_file_name = $new_file;
             }
         }
         else {
@@ -61,7 +61,7 @@ class Uploader
      *
      * @param string $upload_file - upload file
      *
-     * @return bool
+     * @return object
      */
     public function checkAcceptable($upload_file)
     {
@@ -86,9 +86,10 @@ class Uploader
                     break;
                 }
             }
-            else {
-                throw new ActionException(Config::exception()->upload->ex6002);
-            }
+        }
+
+        if (true === empty($result)) {
+            throw new ActionException(Config::exception()->upload->ex6002);
         }
 
         return $result;
@@ -103,10 +104,41 @@ class Uploader
      */
     public function nameFile($filename)
     {
-        $parts    = explode('.', $filename);
-        $parts[0] = md5($filename);
+        $parts = explode('.', $filename);
+        $name = $this->getRandomName();
+        $extension = end($parts);
 
-        return implode('.', $parts);
+        return sprintf('%s.%s', $name, $extension);
+    }
+
+    /**
+     * get random name
+     *
+     * @return string - name
+     */
+    public function getRandomName()
+    {
+        return $this->getRandomString(10) . sha1(time() . rand(1, 1000));
+    }
+
+    /**
+     * get random string
+     *
+     * @param int $len - how long of string what you get
+     *
+     * @return string - name
+     */
+    public function getRandomString($len)
+    {
+        $str = '';
+
+        for ($i = 0; $i < $len; $i++) {
+            $upper_case = (1 === rand(1, 3));
+            $temp_str = chr(rand(97, 122));
+            $str .= (true === $upper_case ? strtoupper($temp_str) : $temp_str);
+        }
+
+        return $str;
     }
 }
 
