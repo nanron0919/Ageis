@@ -31,6 +31,14 @@ abstract class Model extends Builder_Select
     const HAS_FILTER   = 3;
 
     /**
+     * consts of prop
+     */
+    const PROP_DATA_TYPE = 0;
+    const PROP_RANGE     = 1;
+    const PROP_REQUIRED  = 2;
+    const PROP_DEFAULT   = 3;
+
+    /**
      * exception config
      */
     protected $exception;
@@ -73,7 +81,6 @@ abstract class Model extends Builder_Select
      */
     public function __construct($db_driver)
     {
-        // $this->env         = Config::env();
         $this->exception   = Config::exception();
         $this->fill_fields = array($this->table . '.*');
 
@@ -126,9 +133,10 @@ abstract class Model extends Builder_Select
      */
     public function findByKey($val)
     {
-        $sql_builder = $this->from($this->table)->where($this->primary_key, $val);
+        $this->from($this->table)->where($this->primary_key, $val);
+        $result = $this->first();
 
-        return $this->fetchResult($sql_builder);
+        return $result;
     }
 
     /**
@@ -247,7 +255,7 @@ abstract class Model extends Builder_Select
      *
      * @return null
      */
-    protected function saving()
+    public function saving()
     {
         // do something before save
     }
@@ -259,34 +267,39 @@ abstract class Model extends Builder_Select
      */
     public function save()
     {
+        if (empty($this->store_fields)) {
+            // TODO: throw an exception
+        }
+
         // execute before save
         $this->saving();
 
+        $primary_key = $this->primary_key;
         $affect_rows = 0;
         $key_value = '';
 
-        if (false === empty($this->store_fields[$this->primary_key])) {
-            $where = array(
-                $this->primary_key => array($this->store_fields[$this->primary_key])
-            );
-            // temporary save value of primary key
-            $key_value = $where[$this->primary_key];
-            unset($this->store_fields[$this->primary_key]);
-            $affect_rows = $this->update($this->store_fields, $where);
-
-            // set back value of primary key
-            $this->$$this->primary_key = $key_value;
-        }
-        else {
+        try {
+            // try insert first
             $this->insert($this->store_fields);
             $affect_rows = 1;
+        }
+        catch (Exception $e) {
+            // if insert fail do update.
+            if (false === empty($this->store_fields[$primary_key])) {
+                $where = array(
+                    $primary_key => array($key_value)
+                );
+
+                unset($this->store_fields[$primary_key]);
+                $affect_rows = $this->update($this->store_fields, $where);
+            }
         }
 
         // execute after save
         $this->saved();
 
-        // clear
-        $this->store_fields = array();
+        // clear stored values
+        $this->clearStoredValues();
 
         return $affect_rows;
     }
@@ -296,7 +309,7 @@ abstract class Model extends Builder_Select
      *
      * @return null
      */
-    protected function saved()
+    public function saved()
     {
         // do something after save
     }
@@ -306,7 +319,7 @@ abstract class Model extends Builder_Select
      *
      * @return null
      */
-    protected function updating()
+    public function updating()
     {
         // do something before update
     }
@@ -319,7 +332,7 @@ abstract class Model extends Builder_Select
      *
      * @return int
      */
-    protected function update($fields, $where)
+    public function update($fields, $where)
     {
         // do it at begining
         $this->updating();
@@ -347,7 +360,7 @@ abstract class Model extends Builder_Select
         // do it at the end
         $this->updated();
 
-        return $update_result;
+        return $this->db->affectedRows();
     }
 
     /**
@@ -355,7 +368,7 @@ abstract class Model extends Builder_Select
      *
      * @return null
      */
-    protected function updated()
+    public function updated()
     {
         // do something after update
     }
@@ -365,7 +378,7 @@ abstract class Model extends Builder_Select
      *
      * @return null
      */
-    protected function inserting()
+    public function inserting()
     {
         // do something before insert
     }
@@ -377,7 +390,7 @@ abstract class Model extends Builder_Select
      *
      * @return int
      */
-    protected function insert($fields)
+    public function insert($fields)
     {
         // do it before insert
         $this->inserting();
@@ -397,7 +410,7 @@ abstract class Model extends Builder_Select
         // do it after insert
         $this->inserted();
 
-        return $insert_result;
+        return $this->insertId();
     }
 
     /**
@@ -405,7 +418,7 @@ abstract class Model extends Builder_Select
      *
      * @return null
      */
-    protected function inserted()
+    public function inserted()
     {
         // do something after insert
     }
@@ -483,6 +496,16 @@ abstract class Model extends Builder_Select
     ////////////
 
     /**
+     * get insert id
+     *
+     * @return int
+     */
+    public function insertId()
+    {
+        return (true === method_exists($this->db, 'insertId') ? $this->db->insertId() : '');
+    }
+
+    /**
      * __get - set field and value for the new entry
      *
      * @param string $name - field's name
@@ -493,16 +516,64 @@ abstract class Model extends Builder_Select
     public function __get($name)
     {
         if (true === array_key_exists($name, $this->fields)) {
-            return $this->store_fields[$name];
+            return (
+                true === isset($this->store_fields[$name])
+                ? $this->store_fields[$name]
+                : ''
+            );
         }
         else {
-            throw new DataTypeException($this->exception->datatype->$error);
+            throw new DataTypeException($this->exception->database->ex3001);
         }
+    }
+
+    /**
+     * getEmptyEntry - get an empty entry not includes primary key
+     *
+     * @return object
+     */
+    public function getEmptyEntry()
+    {
+        $entry = new stdClass;
+
+        foreach ($this->fields as $name => $prop) {
+            if ($name !== $this->primary_key) {
+                if (true === isset($prop[self::PROP_DEFAULT])) {
+                    $entry->$name = $prop[self::PROP_DEFAULT];
+                }
+                else {
+                    switch ($prop[self::PROP_DATA_TYPE]) {
+                    case 'int':
+                    case 'double':
+                    case 'float':
+                        $entry->$name = 0;
+                        break;
+                    case 'string':
+                        $entry->$name = '';
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+        }
+
+        return $entry;
     }
 
     ////////////////////
     // helper methods //
     ////////////////////
+
+    /**
+     * clear all stored field but primary key
+     *
+     * @return null
+     */
+    public function clearStoredValues()
+    {
+        $this->store_fields = array();
+    }
 
     /**
      * checkSettings - check settings
