@@ -21,7 +21,7 @@ final class i18n
      */
     public static function line($namespace, $key = '', $escape = true)
     {
-        $active_language = self::_getActiveLanguage();
+        $active_language = self::getActiveLanguage();
         $lang = Loader::loadI18n($namespace, $active_language);
 
         if (false === empty($lang)) {
@@ -158,11 +158,11 @@ final class i18n
     /////////////////////
 
     /**
-     * get active language - get active language
+     * getActiveLanguage - get active language
      *
      * @return string
      */
-    private static function _getActiveLanguage()
+    public static function getActiveLanguage()
     {
         $config = Config::i18n();
 
@@ -181,7 +181,7 @@ final class i18n
 
         $intersect_langs = array_intersect($langs, $support_langs);
 
-        if (false === empty($intersect_langs)) {
+        if (false === empty($intersect_langs[0])) {
             $active_language = $intersect_langs[0];
         }
 
