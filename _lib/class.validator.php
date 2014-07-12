@@ -8,22 +8,26 @@
  */
 class Validator
 {
-    const FIELD_VALUE = 0;
-    const FIELD_RANGE = 1;
+    const FIELD_VALUE  = 0;
+    const FIELD_PARAMS = 1;
 
     const RANGE_MAX  = 0;
     const RANGE_MIN  = 1;
 
     protected static $types = array(
-        'int',
-        'float',
-        'double',
-        'string',
-        'bool',
-        'enum',
-        'object',
-        'array',
-        'null'
+        // basic type
+        'int'       => array('is_int', array('ValidatorNumber', 'valid')),
+        'float'     => array('is_float', array('ValidatorNumber', 'valid')),
+        'double'    => array('is_double', array('ValidatorNumber', 'valid')),
+        'string'    => array('is_string', array('ValidatorString', 'valid')),
+        'bool'      => array('is_bool', null),
+        'object'    => array('is_object', null),
+        'array'     => array('is_array', null),
+        'null'      => array('is_null', null),
+        // special format
+        'enum'      => array('is_string', array('ValidatorEnum', 'valid')),
+        'url'       => array('is_string', array('ValidatorUrl', 'valid')),
+        'date'      => array('is_string', array('ValidatorDate', 'valid')),
     );
 
     /**
@@ -38,42 +42,23 @@ class Validator
     {
         $exception = Config::exception();
         $type   = strtolower(substr($name, 2));
-        $value  = (true === isset($arguments[self::FIELD_VALUE]) ? $arguments[self::FIELD_VALUE] : null);
-        $range  = (true === isset($arguments[self::FIELD_RANGE]) ? $arguments[self::FIELD_RANGE] : null);
+        $value  = (true === isset($arguments[self::FIELD_VALUE])  ? $arguments[self::FIELD_VALUE]  : null);
+        $params = (true === isset($arguments[self::FIELD_PARAMS]) ? $arguments[self::FIELD_PARAMS] : null);
 
         $result = 0;
+        $define_types = array_keys(self::$types);
 
-        if (true === in_array($type, self::$types)) {
-            $func = sprintf('is_%s', $type);
+        if (true === in_array($type, $define_types)) {
+            $func = self::$types[$type][0];
+            $validator = self::$types[$type][1];
 
-            // check php native function is existing.
-            if (true === function_exists($func)) {
-                $result = call_user_func_array($func, array($value));
-                $result = (true === $result ? 0 : $exception->datatype->ex2001->code);
-            }
+            // check basic type is ok
+            $result = call_user_func_array($func, array($value));
+            $result = (true === $result ? 0 : $exception->datatype->ex2001->code);
 
-            switch ($type) {
-            case 'string':
-                $len = mb_strlen($value);
-                $result = (true === self::checkRange($len, $range)
-                    ? $result
-                    : $exception->datatype->ex2002->code);
-                break;
-
-            case 'int':
-            case 'float':
-            case 'double':
-                $result = (true === self::checkRange($value, $range)
-                    ? $result
-                    : $exception->datatype->ex2002->code);
-                break;
-
-            case 'enum':
-                $result = (true === self::checkEnum($value, $range)
-                    ? $result
-                    : $exception->datatype->ex2003->code);
-            default:
-                break;
+            // check advance
+            if (0 === $result && null !== $validator) {
+                $result = call_user_func_array($validator, array($value, $params));
             }
         }
 
