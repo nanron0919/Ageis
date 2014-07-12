@@ -36,6 +36,14 @@ return array(
             'code'    => 3001,
             'message' => 'Field doesn\' exist.'
         ),
+        'ex3002' => array(
+            'code'    => 3002,
+            'message' => 'Operating error (%s, %s).'
+        ),
+        'ex3003' => array(
+            'code'    => 3003,
+            'message' => 'No value can be update or insert.'
+        ),
     ),
     'model' => array(
         'ex4001' => array(
