@@ -69,13 +69,11 @@ class Loader
 
         self::_load(Config::controller()->path . $fullpath);
 
-        $class_name = sprintf('Controller%s', ucfirst($controller_name));
-
         if (false === class_exists($class_name)) {
             throw new ActionException(Config::exception()->action->ex5002, $class_name);
         }
 
-        return $class_name;
+        return new $class_name;
     }
 
     /**
@@ -158,9 +156,12 @@ class Loader
     {
         $parts = explode('-', $name);
 
-        foreach ($parts as &$part) {
-            $part = ucfirst($part);
-        }
+        $parts = array_map(
+            function ($part_name) {
+                return ucfirst($part_name);
+            },
+            $parts
+        );
 
         return implode('', $parts);
     }
