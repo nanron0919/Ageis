@@ -21,10 +21,7 @@ abstract class BaseException extends Exception
         $message = sprintf($setting->message, $custom_message);
         parent::__construct($message, $setting->code);
 
-        // always returns 500
-        http_response_code(500);
-
-        set_exception_handler(array('BaseException', 'errorHandler'));
+        set_exception_handler(array($this, 'errorHandler'));
     }
 
     /**
@@ -34,7 +31,7 @@ abstract class BaseException extends Exception
      *
      * @return null
      */
-    public static function errorHandler($ex)
+    public function errorHandler($ex)
     {
         $logger = new Logger;
         $content = sprintf(
@@ -46,12 +43,6 @@ abstract class BaseException extends Exception
         );
         $content .= "\n" . $ex->getTraceAsString();
         $logger->notice($content);
-
-        if ('production' !== Application::getEnv()) {
-            echo '<pre>' . $content . '</pre>';
-        }
-
-        // TODO: redirect to error page
     }
 }
 ?>
