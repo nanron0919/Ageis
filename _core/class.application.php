@@ -28,12 +28,19 @@ final class Application
      */
     public function run()
     {
-        $route           = $this->route->findMatchRoute();
-        $controller_name = Loader::loadController($route->controller);
+        $route = $this->route->findMatchRoute();
 
-        if (false === empty($route) && true === class_exists($controller_name)) {
-            $controller = new $controller_name($route);
-            $controller->run();
+        if (false === empty($route) && false === empty($route->controller)) {
+            $controller = Loader::loadController($route->controller);
+
+            try {
+                $controller->run($route);
+            }
+            catch (Exception $e) {
+                // TODO: do something.
+                var_dump($e);
+            }
+
         }
         else {
             echo 'redirect';
