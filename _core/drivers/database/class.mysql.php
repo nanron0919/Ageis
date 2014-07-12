@@ -136,8 +136,30 @@ final class Mysql extends DatabaseDriver
             }
         }
 
+        $error = $this->error();
+
+        if (false === empty($error->no) && 0 !== $error->no) {
+            $exception = Config::exception()->database->ex3002;
+            $exception->message = sprintf($exception->message, $sql, json_encode($args));
+
+            throw new DatabaseException($exception);
+        }
+
         return $return;
 
+    }
+
+    /**
+     * error
+     *
+     * @return object
+     */
+    public function error()
+    {
+        return (object) array(
+            'no' => $this->connection->errno,
+            'message' => $this->connection->error,
+        );
     }
 
     /**
@@ -150,6 +172,26 @@ final class Mysql extends DatabaseDriver
     public function escape($unescape_string)
     {
         return $this->connection->escape_string($unescape_string);
+    }
+
+    /**
+     * insert id
+     *
+     * @return int
+     */
+    public function insertId()
+    {
+        return $this->connection->insert_id;
+    }
+
+    /**
+     * affect rows
+     *
+     * @return int
+     */
+    public function affectedRows()
+    {
+        return $this->connection->affected_rows;
     }
 }
 ?>
