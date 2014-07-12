@@ -44,12 +44,13 @@ class Builder_Update extends Builder_SQL
 
         if (false === empty($this->temp_sql_array[$this->sections->field])) {
             $sql_setting = $this->temp_sql_array[$this->sections->field];
-            $sql = $setting->head;
+            $fields = array();
 
             foreach ($sql_setting as $key => $val) {
-                $sql .= sprintf(' %s = %s', $val, $key);
+                $fields[] = sprintf('%s = %s', $val, $key);
             }
 
+            $sql = sprintf('%s %s', $setting->head, implode(', ', $fields));
             $this->temp_sql_statement_array[$this->sections->field] = $sql;
         }
         else {
