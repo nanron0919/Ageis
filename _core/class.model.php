@@ -150,6 +150,31 @@ abstract class Model extends Builder_Select
     }
 
     /**
+     * hash - get hash result
+     *
+     * @param string $hashkey - hash key
+     *
+     * @return object - hash array into an object
+     */
+    public function hash($hashkey)
+    {
+        $rows = $this->fetchResult($this);
+        $result = new stdClass;
+
+        foreach ($rows as $key => $row) {
+            $hashkey = (
+                false === empty($row->$hashkey)
+                ? $row->$hashkey
+                : $key
+            );
+
+            $result->$hashkey = $row;
+        }
+
+        return $result;
+    }
+
+    /**
      * first - return first result
      *
      * @return object
@@ -286,12 +311,14 @@ abstract class Model extends Builder_Select
         catch (Exception $e) {
             // if insert fail do update.
             if (false === empty($this->store_fields[$primary_key])) {
+                $key_value = $this->store_fields[$primary_key];
                 $where = array(
                     $primary_key => array($key_value)
                 );
 
                 unset($this->store_fields[$primary_key]);
                 $affect_rows = $this->update($this->store_fields, $where);
+                $this->store_fields[$primary_key] = $key_value;
             }
         }
 
@@ -360,7 +387,7 @@ abstract class Model extends Builder_Select
         // do it at the end
         $this->updated();
 
-        return $this->db->affectedRows();
+        return $update_result;
     }
 
     /**
@@ -394,6 +421,9 @@ abstract class Model extends Builder_Select
     {
         // do it before insert
         $this->inserting();
+
+        // set default from setting
+        $fields = $this->setDefaultValueFromSetting($fields);
 
         $insert = new Builder_Insert;
 
@@ -438,6 +468,24 @@ abstract class Model extends Builder_Select
     ////////////
     // setter //
     ////////////
+
+    /**
+     * setDefaultValueBySetting - set default from setting
+     *
+     * @param array $fields - fields
+     *
+     * @return array
+     */
+    protected function setDefaultValueFromSetting($fields)
+    {
+        foreach ($this->fields as $key => &$field) {
+            if (true === empty($fields[$key]) && true === isset($field[self::PROP_DEFAULT])) {
+                $fields[$key] = $field[self::PROP_DEFAULT];
+            }
+        }
+
+        return $fields;
+    }
 
     /**
      * addIngoreField - add ingore field
