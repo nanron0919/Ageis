@@ -63,7 +63,7 @@ return array(
             'value'   => array('separator' => ', ', 'head' => 'VALUES', 'required' => true),
         ),
         'delete' => array(
-            'from'   => array('separator' => '', 'head' => 'DELETE', 'required' => true),
+            'from'   => array('separator' => '', 'head' => 'DELETE FROM', 'required' => true),
             'where'   => array('separator' => ' AND ', 'head' => 'WHERE', 'required' => true),
             'limit'   => array('separator' => ', ', 'head' => 'LIMIT'),
         ),
