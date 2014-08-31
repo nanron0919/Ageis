@@ -65,6 +65,12 @@ abstract class Model extends Builder_Select
     protected $ingore_update = array();  // dosen't update anyway
 
     /**
+     * pagination
+     */
+    protected $is_pagination     = false;    // setup pagination with limit
+    protected $config_pagination = null; // config pagination
+
+    /**
      * helper objects
      */
     public $sql_builder;
@@ -89,6 +95,9 @@ abstract class Model extends Builder_Select
 
         // setting db connection by driver
         $this->db = $db_driver;
+
+        // setting pagination config as object
+        $this->config_pagination = new stdClass;
 
         parent::__construct();
     }
@@ -221,7 +230,91 @@ abstract class Model extends Builder_Select
         );
         $result = $this->getHasA($result);
 
-        return Converter::arrayToObject(false !== $result ? $this->ingoreFields($result) : new stdClass);
+        if (true === $this->is_pagination) {
+            if (false === empty($result[$this->config_pagination->has_prev_page_idx])) {
+                unset($result[$this->config_pagination->has_prev_page_idx]);
+            }
+            else {
+                $this->config_pagination->prev_page_idx = 0;
+            }
+
+            if (false === empty($result[$this->config_pagination->has_next_page_idx])) {
+                unset($result[$this->config_pagination->has_next_page_idx]);
+            }
+            else {
+                $this->config_pagination->next_page_idx = 0;
+            }
+        }
+
+        return Converter::arrayToObject(
+            false !== $result ? array_values($this->ingoreFields($result)) : array()
+        );
+    }
+
+    /**
+     * pagination
+     *
+     * @param int $curr_page - current page
+     * @param int $limit     - limit
+     *
+     * @return object - this
+     */
+    public function pagination($page, $limit)
+    {
+        // setup pagination on next query.
+        $this->is_pagination = true;
+        $this->config_pagination->curr_page = $page;    // set current page index.
+        $this->config_pagination->has_prev_page_idx = -1;    // if it exists its has prev page.
+        $this->config_pagination->has_next_page_idx = 0;    // if it exists its has next page.
+        $this->config_pagination->prev_page_idx = $page - 1;    // default prev page index.
+        $this->config_pagination->next_page_idx = $page + 1;    // default next page index.
+        $start = $page - 1;
+
+        if (1 < $page) {
+            $this->config_pagination->has_prev_page_idx = 0;
+            $start = ($start * $limit - 1);
+            $limit = $limit + 2;
+        }
+        else {
+            // retrieve the next of the end page.
+            $limit = $limit + 1;
+        }
+
+        if (true === $this->is_pagination) {
+            $this->config_pagination->has_next_page_idx = $limit - 1;
+        }
+
+        $this->limit($start, $limit);
+
+        return $this;
+    }
+
+    /**
+     * get previous page
+     *
+     * @return int - 0 is no previous page
+     */
+    public function getPrevPageIndex()
+    {
+        return (
+            false === empty($this->config_pagination->prev_page_idx)
+            ? $this->config_pagination->prev_page_idx
+            : 0
+        );
+    }
+
+    /**
+     * get next page
+     *
+     * @return int - 0 is no next page
+     */
+    public function getNextPageIndex()
+    {
+        return (
+            false === empty($this->config_pagination->next_page_idx)
+            ? $this->config_pagination->next_page_idx
+            : 0
+        );
     }
 
     /**
