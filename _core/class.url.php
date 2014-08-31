@@ -103,5 +103,16 @@ class Url
         return parse_url($val);
     }
 
+    /**
+     * get current url
+     *
+     * @return string
+     */
+    public static function getCurrent()
+    {
+        $uri = substr(self::requestUri(), 1);
+        return self::bindAbsolute($uri);
+    }
+
 }
 ?>
