@@ -454,6 +454,56 @@ abstract class Model extends Builder_Select
     }
 
     /**
+     * deleting - execute before delete
+     *
+     * @return null
+     */
+    public function deleting()
+    {
+        // do something before delete
+    }
+
+    /**
+     * delete - delete an entry
+     *
+     * @param array $conditions - hash array for delete entry with conditions
+     *
+     * @return bool
+     */
+    public function delete($conditions)
+    {
+        // do it before delete
+        $this->deleting();
+
+        $delete = new Builder_Delete;
+
+        $temp_delete = $delete->from($this->table);
+
+        foreach ($conditions as $key => $value) {
+            $temp_delete->where($key, $value);
+        }
+
+        $result = $temp_delete->build();
+
+        $delete_result = call_user_func_array(array($this->db, 'query'), $result);
+
+        // do it after delete
+        $this->deleted();
+
+        return (0 < $this->db->affectedRows());
+    }
+
+    /**
+     * deleted - execute after delete
+     *
+     * @return null
+     */
+    public function deleted()
+    {
+        // do something after delete
+    }
+
+    /**
      * equals - equals
      *
      * @param object $model - model object
