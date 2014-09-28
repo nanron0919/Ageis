@@ -9,6 +9,7 @@
 final class Application
 {
     public $route;
+    public $config;
 
     /**
      * constructor
@@ -19,6 +20,7 @@ final class Application
         Session::start();
 
         $this->route = new Route;
+        $this->config = Config::env(self::getEnv());
     }
 
     /**
@@ -37,15 +39,17 @@ final class Application
                 $controller->run($route);
             }
             catch (Exception $e) {
-                // TODO: do something.
-                var_dump($e);
+                if (true === $this->config->debug) {
+                    self::debug($e);
+                }
+                else {
+                    Http::redirect($this->config->error->e50x);
+                }
             }
 
         }
         else {
-            echo 'redirect';
-            // TODO: not really does redirect yet.
-            // Http::redirect('http://google.com');
+            Http::redirect($this->config->error->e404);
         }
     }
 
