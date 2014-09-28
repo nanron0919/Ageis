@@ -77,7 +77,11 @@ abstract class Builder_SQL
      */
     public function leftJoin($join_table, $join_field, $ref_field)
     {
-        return $this->join($join_table, $join_field, $ref_field, $this->config->join->left);
+        return $this->join(
+            $join_table,
+            array('from' => $join_field, 'to' => $ref_field),
+            $this->config->join->left
+        );
     }
 
     /**
@@ -91,24 +95,27 @@ abstract class Builder_SQL
      */
     public function rightJoin($join_table, $join_field, $ref_field)
     {
-        return $this->join($join_table, $join_field, $ref_field, $this->config->join->right);
+        return $this->join(
+            $join_table,
+            array('from' => $join_field, 'to' => $ref_field),
+            $this->config->join->right
+        );
     }
 
     /**
-     * join - what table wanna join
+     * join - join
      *
-     * @param string $join_table     - table name
-     * @param string $join_field     - field name
-     * @param string $ref_field      - reference field name
-     * @param string $join_direction - join direction
+     * @param string $join_model  - what model that joined
+     * @param array  $join_fields - join fields [from => ..., to => ...]
+     * @param string $direction   - inner, left or right (default by INNER JOIN)
      *
      * @return object - this
      */
-    public function join($join_table, $join_field, $ref_field, $direction = '')
+    public function join($join_table, $join_fields = array(), $direction = '')
     {
         $join_table = $this->wrapByGraveAccent($join_table);
-        $join_field = $this->wrapByGraveAccent($join_field);
-        $ref_field  = $this->wrapByGraveAccent($ref_field);
+        $join_field = $this->wrapByGraveAccent($join_fields['from']);
+        $ref_field  = $this->wrapByGraveAccent($join_fields['to']);
         $direction  = (false === empty($this->config->join->$direction)
             ? $this->config->join->$direction
             : $this->config->join->inner);
@@ -285,7 +292,7 @@ abstract class Builder_SQL
 
             foreach ($sql_setting as $row) {
                 $this->temp_sql_statement_array[$this->sections->join] .=
-                    sprintf('%s %s ON %s.%s = %s ', $row[0], $row[1], $row[1], $row[2], $row[3]);
+                    sprintf('%s %s ON %s = %s ', $row[0], $row[1], $row[2], $row[3]);
             }
         }
         else {
