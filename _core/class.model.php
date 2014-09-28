@@ -364,6 +364,43 @@ abstract class Model extends Builder_Select
         return $this;
     }
 
+    /**
+     * join - join
+     *
+     * @param string $join_model  - what model that joined
+     * @param array  $join_fields - join fields
+     * @param string $direction   - inner, left or right (default by INNER JOIN)
+     *
+     * @return this
+     */
+    public function join($join_model, $join_fields = array(), $direction = 'INNER JOIN')
+    {
+        if (true === $this->equals($join_model)) {
+            $ref_fields = array(
+                'from' => '',
+                'to' => '',
+            );
+
+            $ref_fields['from'] = (
+                false === empty($join_fields['from'])
+                ? $join_fields['from']
+                : $this->getTableName() . '.' . $this->primary_key
+            );
+            $ref_fields['to'] = (
+                false === empty($join_fields['to'])
+                ? $join_fields['to']
+                : $join_model->getTableName() . '.' . $join_model->getPrimaryKey()
+            );
+
+            parent::join($join_model->getTableName(), $ref_fields, $direction);
+        }
+        else {
+            throw new ModelException($this->exception->model->ex4003);
+        }
+
+        return $this;
+    }
+
     /////////////////
     // modify data //
     /////////////////
@@ -750,6 +787,26 @@ abstract class Model extends Builder_Select
         }
 
         return $entry;
+    }
+
+    /**
+     * get table name
+     *
+     * @return string
+     */
+    public function getTableName()
+    {
+        return $this->table;
+    }
+
+    /**
+     * get primary key
+     *
+     * @return string
+     */
+    public function getPrimaryKey()
+    {
+        return $this->primary_key;
     }
 
     ////////////////////
