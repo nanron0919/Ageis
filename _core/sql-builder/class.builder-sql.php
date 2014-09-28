@@ -254,7 +254,14 @@ abstract class Builder_SQL
 
         // make the values are following the order appeared
         foreach ($matches[0] as $name) {
-            $result[] = $values[$name];
+            $value = &$values[$name];
+
+            if (true === is_array($value)) {
+                $result = array_merge($result, (array) array_pop($value));
+            }
+            else {
+                $result[] = $value;
+            }
         }
 
         return $result;
@@ -360,7 +367,15 @@ abstract class Builder_SQL
             $sql_array = array();
 
             foreach ($sql_setting as $key => $row) {
-                $sql_array[] = sprintf('%s %s %s', $row[0], $row[1], $key);
+                if ('IN' === $row[1]) {
+                    $parameters = array_pad(array() , count($this->temp_sql_array[$this->sections->value][$key]), $key);
+                    $part_where = sprintf('%s %s (%s)', $row[0], $row[1], implode(',', $parameters));
+
+                    $sql_array[] = $part_where;
+                }
+                else {
+                    $sql_array[] = sprintf('%s %s %s', $row[0], $row[1], $key);
+                }
             }
 
             $sql = sprintf('%s %s', $setting->head, implode($setting->separator, $sql_array));
