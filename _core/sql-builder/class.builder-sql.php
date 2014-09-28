@@ -194,8 +194,14 @@ abstract class Builder_SQL
     public function where($field, $value, $comparator = '=')
     {
         $field      = $this->wrapByGraveAccent($field);
-        $comparator = (false === empty($comparator) ? $comparator : '=');
-        $comparator = (false === is_array($value) ? $comparator : 'IN');
+        $comparator = strtoupper(false === empty($comparator) ? $comparator : '=');
+        $is_multi_value = (true === is_array($value));
+
+        $comparator = (
+            true === $is_multi_value && false === in_array($comparator, array('IN', 'NOT IN'))
+            ? 'IN'
+            : $comparator
+        );
 
         // fixed the order of parameters.
         $name = $this->setValue($value);
@@ -367,7 +373,7 @@ abstract class Builder_SQL
             $sql_array = array();
 
             foreach ($sql_setting as $key => $row) {
-                if ('IN' === $row[1]) {
+                if (true === in_array($row[1], array('IN', 'NOT IN'))) {
                     $parameters = array_pad(array() , count($this->temp_sql_array[$this->sections->value][$key]), $key);
                     $part_where = sprintf('%s %s (%s)', $row[0], $row[1], implode(',', $parameters));
 
