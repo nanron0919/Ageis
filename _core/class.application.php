@@ -9,7 +9,7 @@
 final class Application
 {
     public $route;
-    public $config;
+    public static $config;
 
     /**
      * constructor
@@ -20,8 +20,11 @@ final class Application
         Session::start();
 
         $this->route = new Route;
-        $this->config = Config::env(self::getEnv());
+
+        // setting up application environment
+        $this->settingUp();
     }
+
 
     /**
      * run - run application
@@ -64,13 +67,40 @@ final class Application
     }
 
     /**
+     * setting up application running environment
+     *
+     * @param string $hostname - host name
+     *
+     * @return null
+     */
+    public static function settingUp($hostname = '')
+    {
+        $config = Config::env();
+
+        // get config
+        if (true === property_exists($config, Url::host())) {
+            $config = $config->{Url::host()};
+        }
+        else {
+            $config = (false === empty($config->default) ? $config->default : null);
+        }
+
+        if (true === empty($config)) {
+            $ex = Config::exception()->application->ex1003;
+            throw new ApplicationException($ex);
+        }
+
+        self::$config = $config;
+    }
+
+    /**
      * getEnv - get environment
      *
      * @return string - enviroment
      */
     public static function getEnv()
     {
-        return Config::env()->env;
+        return self::$config->env;
     }
 
     /**
