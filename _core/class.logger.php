@@ -12,8 +12,7 @@ final class Logger
     {
         // get config
         $config_logger = Config::logger();
-        $level = (false === empty($config_logger->levels->$name) ? $name : 'notice');
-        $config_level = $config_logger->levels->$level;
+        $level = (true === in_array($name, $config_logger->levels) ? $name : 'notice');
 
         // format content
         $content = date('H:i:s') . ' - ' . (false === empty($arguments[0]) ? $arguments[0] : '');
