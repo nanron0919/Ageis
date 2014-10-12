@@ -6,7 +6,7 @@
 /*
  * home controller
  */
-class Controller_Home extends controller
+class ControllerHome extends controller
 {
     /**
      * method index
