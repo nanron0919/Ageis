@@ -20,7 +20,7 @@ class Config
      */
     public static function __callStatic($name, $arguments)
     {
-        $env = (false === empty($arguments[0]) ? $arguments[0] : '');
+        $levels = explode('/', (false === empty($arguments[0]) ? $arguments[0] : ''));
         $filename = sprintf('%s/_configs/config.%s.php', APP_ROOT, $name);
         $config = array();
 
@@ -29,8 +29,10 @@ class Config
         }
 
         // fetch for a specific root
-        if (false === empty($config[$env])) {
-            $config = $config[$env];
+        foreach ($levels as $level) {
+            if (true === array_key_exists($level, $config)) {
+                $config = $config[$level];
+            }
         }
 
         if (false === empty(self::$_plus_setting[$name])) {
