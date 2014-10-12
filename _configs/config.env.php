@@ -4,7 +4,7 @@
  */
 
 // config set is group by host and the default must be exist
-$configs = array(
+return array(
     /////////////////////////////////////////////
     // essential settings below, do not remove //
     /////////////////////////////////////////////
@@ -18,14 +18,4 @@ $configs = array(
         ),
     )
 );
-
-// get config
-if (true === array_key_exists($_SERVER['HTTP_HOST'], $configs)) {
-    $config = $configs[$_SERVER['HTTP_HOST']];
-}
-else {
-    $config = $configs['default'];
-}
-
-return $config;
 ?>
