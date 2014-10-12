@@ -16,6 +16,10 @@ return array(
             'code'    => 1002,
             'message' => 'Class is not existing.'
         ),
+        'ex1003' => array(
+            'code'    => 1003,
+            'message' => 'Environment config doesnt exist.'
+        ),
     ),
     'datatype' => array(
         'ex2001' => array(
