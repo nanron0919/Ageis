@@ -34,6 +34,8 @@ final class Application
     public function run()
     {
         $route = $this->route->findMatchRoute();
+        $redirect_url = '';
+        $ex = null;
 
         if (false === empty($route) && false === empty($route->controller)) {
             $controller = Loader::loadController($route->controller);
@@ -42,18 +44,21 @@ final class Application
                 $controller->run($route);
             }
             catch (Exception $e) {
-                if (true === $this->config->debug) {
-                    self::debug($e);
-                }
-                else {
-                    Http::redirect($this->config->error->e50x);
-                }
+                $ex = $e;
+                $redirect_url = $this->config->error->e50x;
             }
-
         }
         else {
-            Http::redirect($this->config->error->e404);
+            $redirect_url = $this->config->error->e404;
         }
+
+        if (true === $this->config->debug) {
+            self::displayError($ex);
+        }
+        else {
+            Http::redirect($redirect_url);
+        }
+
     }
 
     /**
@@ -86,8 +91,9 @@ final class Application
         }
 
         if (true === empty($config)) {
-            $ex = Config::exception()->application->ex1003;
-            throw new ApplicationException($ex);
+            $ex = new ApplicationException(Config::exception()->application->ex1003);
+            self::displayError($ex);
+            throw $ex;
         }
 
         self::$config = $config;
@@ -100,7 +106,7 @@ final class Application
      */
     public static function getEnv()
     {
-        return self::$config->env;
+        return (true === isset(self::$config->env) ? self::$config->env : 'development');
     }
 
     /**
@@ -121,5 +127,42 @@ final class Application
         }
     }
 
+    /**
+     * displayError
+     *
+     * @param Exception $ex - exception
+     *
+     * @return null
+     */
+    protected static function displayError($ex)
+    {
+        $wrapper_style = array(
+            'border: 1px solid #ccc',
+            'box-shadow: 0 30px 100px 5px rgba(0, 0, 0, .5)',
+            'word-break: break-all',
+            'padding: 5px;',
+            'word-wrap: break-word',
+        );
+        $header_style = array(
+            'font-size: 22px',
+        );
+        $pre_style = array(
+            'padding: 5px;',
+            'word-break: break-all',
+            'word-wrap: break-word',
+        );
+
+        HttpResponse::html(sprintf(
+            '<div style="%s">
+                <h1 style="%s">%s:</h1>
+                <pre style="%s"><code>%s</code></pre>
+            </div>',
+            implode(';', $wrapper_style),
+            implode(';', $header_style),
+            ucfirst($ex->getLevel()),
+            implode(';', $pre_style),
+            $ex->getMessages()
+        ));
+    }
 }
 ?>
