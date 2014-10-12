@@ -8,6 +8,8 @@
  */
 abstract class BaseException extends Exception
 {
+    protected $level;
+
     /**
      * constructor
      *
@@ -19,9 +21,53 @@ abstract class BaseException extends Exception
     public function __construct($setting, $custom_message = '')
     {
         $message = sprintf($setting->message, $custom_message);
+        $level = (false === empty($setting->level) ? $setting->level : 'notice');
+        $this->setLevel($level);
+
         parent::__construct($message, $setting->code);
 
         set_exception_handler(array($this, 'errorHandler'));
+    }
+
+    /**
+     * set exception level
+     *
+     * @param string $level - level
+     *
+     * @return null
+     */
+    public function setLevel($level)
+    {
+        $this->level = $level;
+    }
+
+    /**
+     * get exception level
+     *
+     * @return string
+     */
+    public function getLevel()
+    {
+        return $this->level;
+    }
+
+    /**
+     * get messages
+     *
+     * @return null
+     */
+    public function getMessages()
+    {
+        $content = sprintf(
+            '(%s) File: (%s), Line (%s): %s',
+            $this->getCode(),
+            $this->getFile(),
+            $this->getLine(),
+            $this->getMessage()
+        );
+        $content .= "\n" . $this->getTraceAsString();
+
+        return $content;
     }
 
     /**
@@ -34,15 +80,11 @@ abstract class BaseException extends Exception
     public function errorHandler($ex)
     {
         $logger = new Logger;
-        $content = sprintf(
-            '(%s) File: (%s), Line (%s): %s',
-            $ex->getCode(),
-            $ex->getFile(),
-            $ex->getLine(),
-            $ex->getMessage()
+
+        call_user_func_array(
+            array($logger, $this->level),
+            array($this->getMessages())
         );
-        $content .= "\n" . $ex->getTraceAsString();
-        $logger->notice($content);
     }
 }
 ?>
