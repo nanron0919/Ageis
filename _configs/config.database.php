@@ -12,9 +12,9 @@ return array(
         'default' => array(
             'host'     => 'localhost',
             'driver'   => 'mysql',  // using /_core/drivers/class.mysql.php to create a database connection
-            'database' => 'jersey',
-            'user'     => 'jersey',
-            'password' => 'p82QWfaenPGbe6sJ',
+            'database' => 'database',
+            'user'     => 'database',
+            'password' => 'password',
             'timezone' => '+8:00',
             'charset'  => 'utf8'
         )
