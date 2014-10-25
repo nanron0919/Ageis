@@ -1,6 +1,7 @@
 # Ageis
 ##  Introduce 
 *   Easy to use
+*   A lightweight, easy grasp framework
 *   Isolated environment
 *   Nice configuation
 
