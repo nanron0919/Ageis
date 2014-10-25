@@ -52,11 +52,13 @@ final class Application
             $redirect_url = $this->config->error->e404;
         }
 
-        if (true === $this->config->debug) {
-            self::displayError($ex);
-        }
-        else {
-            Http::redirect($redirect_url);
+        if (true === isset($ex)) {
+            if (true === self::$config->debug) {
+                self::displayError($ex);
+            }
+            else {
+                Http::redirect($redirect_url);
+            }
         }
 
     }
