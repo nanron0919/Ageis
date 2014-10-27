@@ -22,7 +22,7 @@ final class Application
         $this->route = new Route;
 
         // setting up application environment
-        $this->settingUp();
+        self::$config = Environment::getConfig();
     }
 
 
@@ -71,34 +71,6 @@ final class Application
     public function loadRoute()
     {
         $this->route->findMatchRoute();
-    }
-
-    /**
-     * setting up application running environment
-     *
-     * @param string $hostname - host name
-     *
-     * @return null
-     */
-    public static function settingUp($hostname = '')
-    {
-        $config = Config::env();
-
-        // get config
-        if (true === property_exists($config, Url::host())) {
-            $config = $config->{Url::host()};
-        }
-        else {
-            $config = (false === empty($config->default) ? $config->default : null);
-        }
-
-        if (true === empty($config)) {
-            $ex = new ApplicationException(Config::exception()->application->ex1003);
-            self::displayError($ex);
-            throw $ex;
-        }
-
-        self::$config = $config;
     }
 
     /**
