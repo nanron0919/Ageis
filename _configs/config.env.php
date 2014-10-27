@@ -11,7 +11,6 @@ return array(
     'default' => array(
         'env'    => 'development',
         'debug'  => true,
-        'is_cli' => (php_sapi_name() === 'cli'),
         'error'  => array(
             'e404' => 'static/not-found',
             'e50x' => 'static/error',
