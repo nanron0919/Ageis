@@ -14,10 +14,8 @@ class Http
      */
     public static function redirect($uri, $code = 302)
     {
-        $config = Config::env();
-
         // if now in cli mode
-        if (false === $config->is_cli) {
+        if (false === Environment::isCli()) {
             // Specific URL
             $location = null;
 
