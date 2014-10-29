@@ -20,3 +20,5 @@
           include        fastcgi_params;
         }
 3. Enjoy it      
+
+[Wiki](https://github.com/nanron0919/Ageis/wiki)
