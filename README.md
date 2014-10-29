@@ -1,4 +1,6 @@
-# Ageis
+# Ageis 
+> Ver.1.0.0
+
 ##  Introduce 
 *   Easy to use
 *   A lightweight, easy grasp framework
