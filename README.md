@@ -1,7 +1,7 @@
-# Ageis 
-> Ver.1.0.0
+# Ageis
+> Ver.1.0.1
 
-##  Introduce 
+##  Introduce
 *   Easy to use
 *   A lightweight, easy grasp framework
 *   Isolated environment
@@ -21,6 +21,6 @@
           fastcgi_param  SCRIPT_FILENAME  $document_root$fastcgi_script_name;
           include        fastcgi_params;
         }
-3. Enjoy it      
+3. Enjoy it
 
 [Wiki](https://github.com/nanron0919/Ageis/wiki)
