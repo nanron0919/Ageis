@@ -90,7 +90,10 @@ final class View
         $content = '';
         $key = Url::requestUri();
 
-        if (true === $config->cache && true === $caching->isValid($key)) {
+        if (true === isset($config->cache)
+            && true === $config->cache
+            && true === $caching->isValid($key)
+        ) {
             $content = $caching->read($key);
         }
 
