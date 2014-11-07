@@ -437,7 +437,6 @@ abstract class Model extends Builder_Select
 
         try {
             // try insert first
-            var_dump('asdfsadf');
             $this->insert($this->store_fields);
             $affect_rows = 1;
         }

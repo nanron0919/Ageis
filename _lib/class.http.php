@@ -20,7 +20,6 @@ class Http
      */
     public static function redirect($uri, $code = 302)
     {
-        var_dump($uri);
         // if now in cli mode
         if (false === Environment::isCli()) {
             // Specific URL
