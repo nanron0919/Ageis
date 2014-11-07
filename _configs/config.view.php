@@ -5,7 +5,7 @@ return array(
     /////////////////////////////////////////////
 
     'path' => APP_ROOT . '/_views',
-    'cache' => true,
+    'cache' => false,
     'caching_path' =>  '_tmp/views',
     'expired' => 3600,
 );
