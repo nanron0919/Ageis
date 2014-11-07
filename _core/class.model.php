@@ -440,7 +440,7 @@ abstract class Model extends Builder_Select
             $this->insert($this->store_fields);
             $affect_rows = 1;
         }
-        catch (Exception $e) {
+        catch (\Exception $e) {
             // if insert fail do update.
             if (false === empty($this->store_fields[$primary_key])) {
                 $key_value = $this->store_fields[$primary_key];
@@ -566,7 +566,6 @@ abstract class Model extends Builder_Select
         }
 
         $result = $temp_insert->build();
-
         $insert_result = call_user_func_array(array($this->db, 'query'), $result);
 
         // do it after insert
