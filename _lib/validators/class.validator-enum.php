@@ -3,6 +3,8 @@
  * validator for enum
  */
 
+namespace Ageis;
+
 /**
  * class validator-enum
  */

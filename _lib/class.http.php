@@ -2,6 +2,12 @@
 /**
  * global redirect function, written by the guys @ http://edoceo.com/creo/php-redirect
  */
+
+namespace Ageis;
+
+/**
+ * class Http
+ */
 class Http
 {
     /**
@@ -14,6 +20,7 @@ class Http
      */
     public static function redirect($uri, $code = 302)
     {
+        var_dump($uri);
         // if now in cli mode
         if (false === Environment::isCli()) {
             // Specific URL

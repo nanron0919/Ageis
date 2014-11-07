@@ -3,6 +3,8 @@
  * validator for url
  */
 
+namespace Ageis;
+
 /**
  * class validator-url
  */

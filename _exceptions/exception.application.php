@@ -3,6 +3,8 @@
  * Application exception
  */
 
+namespace Ageis;
+
 /**
  * Application exception
  */

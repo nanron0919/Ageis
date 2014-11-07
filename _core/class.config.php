@@ -1,7 +1,9 @@
 <?php
 /**
- * class config
+ * to load and inject config
  */
+
+namespace Ageis;
 
 /**
  * class config

@@ -3,6 +3,8 @@
  * class Image
  */
 
+namespace Ageis;
+
 /**
  * class Image
  */

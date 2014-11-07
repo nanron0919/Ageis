@@ -3,6 +3,8 @@
  * class HttpResponse
  */
 
+namespace Ageis;
+
 /**
  * class HttpResponse
  */

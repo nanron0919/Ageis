@@ -3,6 +3,8 @@
  * class uploader
  */
 
+namespace Ageis;
+
 /**
  * class uploader
  */
@@ -68,7 +70,7 @@ class Uploader
         $type_parts = explode('/', $upload_file['type']);
         $file_type  = end($type_parts);
         $file_name  = $upload_file['name'];
-        $result     = new stdClass;
+        $result     = new \stdclass;
 
         foreach ($this->config->file_filter as $key => $filter) {
             $keys = explode('|', $key);

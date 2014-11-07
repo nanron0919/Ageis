@@ -2,6 +2,8 @@
 /**
  * class builder update
  */
+
+namespace Ageis;
 require_once 'class.builder-sql.php';
 /**
  * class builder update

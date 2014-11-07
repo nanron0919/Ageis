@@ -3,6 +3,8 @@
  * validator for number
  */
 
+namespace Ageis;
+
 /**
  * class validator-number
  */

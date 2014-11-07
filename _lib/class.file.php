@@ -3,6 +3,8 @@
  * File class
  */
 
+namespace Ageis;
+
 /**
  * File class
  */

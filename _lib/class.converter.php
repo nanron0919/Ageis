@@ -3,6 +3,8 @@
  * class converter
  */
 
+namespace Ageis;
+
 /**
  * class converter
  */

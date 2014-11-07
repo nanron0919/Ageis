@@ -3,6 +3,8 @@
  * that does handle all of cache store, clear and generate
  */
 
+namespace Ageis;
+
 /**
  * class caching
  */

@@ -3,6 +3,8 @@
  * class database driver
  */
 
+namespace Ageis;
+
 /**
  * class database driver
  */

@@ -3,6 +3,8 @@
  * class builder sql
  */
 
+namespace Ageis;
+
 /**
  * class builder sql
  */

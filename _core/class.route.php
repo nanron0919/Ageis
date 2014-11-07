@@ -3,6 +3,8 @@
  * class Route
  */
 
+namespace Ageis;
+
 /**
  * class Route
  */

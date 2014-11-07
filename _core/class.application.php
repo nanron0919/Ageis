@@ -1,10 +1,12 @@
 <?php
 /**
- * application
+ * define application
  */
 
+namespace Ageis;
+
 /**
- * application
+ * class application
  */
 final class Application
 {

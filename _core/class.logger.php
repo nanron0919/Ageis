@@ -3,6 +3,8 @@
  * class Logger
  */
 
+namespace Ageis;
+
 /**
  * class Logger
  */

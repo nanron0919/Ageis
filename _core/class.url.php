@@ -3,6 +3,8 @@
  * class Url
  */
 
+namespace Ageis;
+
 /**
  * class Url
  */

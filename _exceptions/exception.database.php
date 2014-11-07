@@ -3,6 +3,8 @@
  * database exception
  */
 
+namespace Ageis;
+
 /**
  * database exception
  */

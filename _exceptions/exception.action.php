@@ -3,6 +3,8 @@
  * action exception
  */
 
+namespace Ageis;
+
 /**
  * action exception
  */

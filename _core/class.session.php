@@ -3,6 +3,8 @@
  * Class Session
  */
 
+namespace Ageis;
+
 /**
  * Class Session
  */

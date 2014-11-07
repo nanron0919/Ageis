@@ -3,6 +3,8 @@
  * class validator
  */
 
+namespace Ageis;
+
 /**
  * class validator
  */
@@ -16,18 +18,18 @@ class Validator
 
     protected static $types = array(
         // basic type
-        'int'       => array('is_int', array('ValidatorNumber', 'valid')),
-        'float'     => array('is_float', array('ValidatorNumber', 'valid')),
-        'double'    => array('is_double', array('ValidatorNumber', 'valid')),
-        'string'    => array('is_string', array('ValidatorString', 'valid')),
+        'int'       => array('is_int', array('Ageis\ValidatorNumber', 'valid')),
+        'float'     => array('is_float', array('Ageis\ValidatorNumber', 'valid')),
+        'double'    => array('is_double', array('Ageis\ValidatorNumber', 'valid')),
+        'string'    => array('is_string', array('Ageis\ValidatorString', 'valid')),
         'bool'      => array('is_bool', null),
         'object'    => array('is_object', null),
         'array'     => array('is_array', null),
         'null'      => array('is_null', null),
         // special format
-        'enum'      => array('is_string', array('ValidatorEnum', 'valid')),
-        'url'       => array('is_string', array('ValidatorUrl', 'valid')),
-        'date'      => array('is_string', array('ValidatorDate', 'valid')),
+        'enum'      => array('is_string', array('Ageis\ValidatorEnum', 'valid')),
+        'url'       => array('is_string', array('Ageis\ValidatorUrl', 'valid')),
+        'date'      => array('is_string', array('Ageis\ValidatorDate', 'valid')),
     );
 
     /**

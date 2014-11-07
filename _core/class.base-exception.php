@@ -3,10 +3,12 @@
  * class BaseException
  */
 
+namespace Ageis;
+
 /**
  * class BaseException
  */
-abstract class BaseException extends Exception
+abstract class BaseException extends \Exception
 {
     protected $level;
 

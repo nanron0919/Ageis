@@ -1,5 +1,11 @@
 <?php
 /**
+ * loader
+ */
+
+namespace Ageis;
+
+/**
  * class loader
  */
 class Loader
@@ -65,7 +71,7 @@ class Loader
     {
         $filepath = self::normalizeFilePath($controller_name, 'controller');
         $fullpath = $filepath['fullpath'];
-        $class_name = $filepath['class_name'];
+        $class_name = 'Ageis\\' . $filepath['class_name'];
 
         self::_load(Config::controller()->path . $fullpath);
 
@@ -87,7 +93,7 @@ class Loader
     {
         $filepath   = self::normalizeFilePath($model_name, 'model');
         $fullpath   = $filepath['fullpath'];
-        $class_name = $filepath['class_name'];
+        $class_name = 'Ageis\\' . $filepath['class_name'];
 
         self::_load(Config::model()->path . $fullpath);
 
@@ -244,5 +250,4 @@ class Loader
         return $files;
     }
 }
-
 ?>

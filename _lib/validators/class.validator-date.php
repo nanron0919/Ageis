@@ -3,6 +3,8 @@
  * validator for date
  */
 
+namespace Ageis;
+
 /**
  * class validator-date
  */

@@ -3,6 +3,8 @@
  * base controller
  */
 
+namespace Ageis;
+
 /**
  * base controller
  */
@@ -27,7 +29,7 @@ abstract class Controller
         $caching_content = View::getCache(Url::requestUri());
 
         if (false === empty($caching_content)) {
-            HttpResponse::html($caching_content);
+            Ageis\HttpResponse::html($caching_content);
         }
         else {
             $request_vars = array(
@@ -74,7 +76,7 @@ abstract class Controller
 
         foreach ($map as $key => $request) {
             foreach ($request as $name => $val) {
-                $request_vars[$key][$name] = call_user_func('HttpRequest::' . $key, $name);
+                $request_vars[$key][$name] = call_user_func('Ageis\HttpRequest::' . $key, $name);
             }
         }
 

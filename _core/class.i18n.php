@@ -3,6 +3,8 @@
  * to get multiple language setting.
  */
 
+namespace Ageis;
+
 /**
  * i18n
  */
@@ -128,7 +130,7 @@ final class i18n
                 $mapping[$o] = (object) $config->locale_map;
             }
             else {
-                $mapping[$o] = new stdClass;
+                $mapping[$o] = new \stdClass;
             }
         }
 

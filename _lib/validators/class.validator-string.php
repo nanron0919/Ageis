@@ -3,6 +3,8 @@
  * validator for string
  */
 
+namespace Ageis;
+
 /**
  * class validator-string
  */

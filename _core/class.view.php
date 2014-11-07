@@ -3,6 +3,8 @@
  * View
  */
 
+namespace Ageis;
+
 /**
  * View
  */

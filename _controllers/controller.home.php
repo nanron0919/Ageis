@@ -3,10 +3,12 @@
  * home controller
  */
 
+namespace Ageis;
+
 /*
  * home controller
  */
-class ControllerHome extends controller
+class ControllerHome extends Controller
 {
     /**
      * method index

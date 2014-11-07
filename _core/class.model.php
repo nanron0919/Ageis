@@ -2,6 +2,8 @@
 /**
  * class model
  */
+
+namespace Ageis;
 require_once FRAMEWORK_ROOT . '/_core/sql-builder/class.builder-select.php';
 
 /**
@@ -97,7 +99,7 @@ abstract class Model extends Builder_Select
         $this->db = $db_driver;
 
         // setting pagination config as object
-        $this->config_pagination = new stdClass;
+        $this->config_pagination = new \stdClass;
 
         parent::__construct();
     }
@@ -168,7 +170,7 @@ abstract class Model extends Builder_Select
     public function hash($hashkey)
     {
         $rows = $this->fetchResult($this);
-        $result = new stdClass;
+        $result = new \stdclass;
 
         foreach ($rows as $key => $row) {
             $hashkey = (
@@ -191,7 +193,7 @@ abstract class Model extends Builder_Select
     public function first()
     {
         $rows = $this->fetchResult($this->limit(0, 1));
-        $row = new stdClass;
+        $row = new \stdclass;
 
         if (0 < count($rows)) {
             $row = $rows[0];
@@ -435,6 +437,7 @@ abstract class Model extends Builder_Select
 
         try {
             // try insert first
+            var_dump('asdfsadf');
             $this->insert($this->store_fields);
             $affect_rows = 1;
         }
@@ -700,7 +703,7 @@ abstract class Model extends Builder_Select
             $field    = $this->fields[$name];
             $type     = $field[self::FIELD_TYPE];
             $range    = (true === isset($field[self::FIELD_RANGE]) ? $field[self::FIELD_RANGE] : array());
-            $func     = array('Validator', 'is' . $type);
+            $func     = array('Ageis\Validator', 'is' . $type);
             $required = (true === isset($field[self::FIELD_REQUIRED]) ? $field[self::FIELD_REQUIRED] : false);
             $args     = array($val, $range, $required);
             $code     = call_user_func_array($func, $args);
@@ -762,7 +765,7 @@ abstract class Model extends Builder_Select
      */
     public function getEmptyEntry()
     {
-        $entry = new stdClass;
+        $entry = new \stdclass;
 
         foreach ($this->fields as $name => $prop) {
             if ($name !== $this->primary_key) {

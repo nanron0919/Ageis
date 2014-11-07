@@ -2,6 +2,9 @@
 /**
  * To get environment variables
  */
+
+namespace Ageis;
+
 /**
  * environment class
  */

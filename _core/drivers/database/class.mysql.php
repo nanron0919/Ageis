@@ -3,6 +3,8 @@
  * class mysql
  */
 
+namespace Ageis;
+
 /**
  * class mysql
  */
@@ -16,7 +18,7 @@ final class Mysql extends DatabaseDriver
     public function connection()
     {
         if (false === isset($this->connection)) {
-            $this->connection = new mysqli($this->config->host, $this->config->user, $this->config->password, $this->config->database);
+            $this->connection = new \mysqli($this->config->host, $this->config->user, $this->config->password, $this->config->database);
 
             if (0 < $this->connection->connect_errno) {
                 // TODO: throw an exception

@@ -3,6 +3,8 @@
  * model exception
  */
 
+namespace Ageis;
+
 /**
  * model exception
  */

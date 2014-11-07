@@ -3,6 +3,8 @@
  * datatype exception
  */
 
+namespace Ageis;
+
 /**
  * datatype exception
  */
