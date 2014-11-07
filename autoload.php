@@ -8,7 +8,7 @@ define('APP_ROOT', dirname(dirname($included[0]))); // without trailing slash
 
 // load core module
 include FRAMEWORK_ROOT . '/_core/class.loader.php';
-Ageis\Loader::loadCore()->loadLibrary()->loadException();
+Ageis\Loader::loadCore();
 unset($included);
 
 foreach (Ageis\Config::helper()->autoload_helpers as $helper) {
