@@ -23,19 +23,21 @@ class Loader
     }
 
     /**
-     * loadLibrary - loadLibrary
+     * loadLibrary
+     *
+     * @param string $helper_name - helper name
      *
      * @return null
      */
-    public static function loadLibrary()
+    public static function loadLibrary($lib_name)
     {
-        self::_load(FRAMEWORK_ROOT . '/_lib/');
+        self::_load(FRAMEWORK_ROOT . '/_lib/' . $lib_name . '.php');
 
         return new Loader;
     }
 
     /**
-     * loadException - loadException
+     * loadException
      *
      * @return null
      */
@@ -47,7 +49,7 @@ class Loader
     }
 
     /**
-     * loadHelper - loadHelper
+     * loadHelper
      *
      * @param string $helper_name - helper name
      *
@@ -61,7 +63,7 @@ class Loader
     }
 
     /**
-     * loadController - loadController
+     * loadController
      *
      * @param string $controller_name - controller name
      *
@@ -83,7 +85,7 @@ class Loader
     }
 
     /**
-     * loadModel - loadModel
+     * loadModel
      *
      * @param string $model_name - model name
      *
@@ -105,7 +107,7 @@ class Loader
     }
 
     /**
-     * loadI18n - loadI18n
+     * loadI18n
      *
      * @param string $i18n_name       - i18n name
      * @param string $active_language - active language
