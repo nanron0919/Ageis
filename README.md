@@ -1,5 +1,4 @@
 # Ageis
-> Ver.1.0.1
 
 ##  Introduce
 *   Easy to use
