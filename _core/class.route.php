@@ -10,6 +10,9 @@ namespace Ageis;
  */
 class Route
 {
+    const DEFAULT_CONTROLLER = 'home';
+    const DEFAULT_METHOD     = 'index';
+
     private $_routes = array();
     private $_uri    = '';
 
@@ -36,7 +39,7 @@ class Route
     public function findMatchRoute()
     {
         $_route = (object) array(
-            'controller' => ''
+            'controller' => self::DEFAULT_CONTROLLER,
         );
 
         foreach ($this->_routes as $name => &$route) {
@@ -46,6 +49,17 @@ class Route
                 $this->bindParams($route, $matches);
                 $_route = $route;
                 break;
+            }
+        }
+
+        // if doesn't have method that setting with default method
+        if (true === empty($_route->params['method'])) {
+            if (false === empty($_route->method)) {
+                $_route->params['method'] = $_route->method;
+                unset($_route->method);
+            }
+            else {
+                $_route->params['method'] = self::DEFAULT_METHOD;
             }
         }
 
