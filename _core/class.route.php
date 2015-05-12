@@ -26,7 +26,7 @@ class Route
         // remove query string from uri
         $url = Url::path();
 
-        $this->_uri = str_replace('-', '_', $url);
+        $this->_uri = $url;
 
         $this->replaceRoutePattern();
     }
