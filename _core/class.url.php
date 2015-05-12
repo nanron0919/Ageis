@@ -11,7 +11,7 @@ namespace Ageis;
 class Url
 {
     /**
-     * segment - segments for url
+     * requestUri - get request uri
      *
      * @return array
      */
@@ -27,7 +27,7 @@ class Url
      */
     public static function segment()
     {
-        preg_match_all('/\/(?<segment>\w+)/', self::requestUri(), $matches);
+        preg_match_all('/\/(?<segment>[\w-]+)/', self::requestUri(), $matches);
         return $matches['segment'];
     }
 
