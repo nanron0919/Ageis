@@ -75,20 +75,32 @@ final class i18n
      */
     public static function detectBroserLanguage()
     {
-        $language = $_SERVER['HTTP_ACCEPT_LANGUAGE'];
-        $language = strtolower(false === empty($language) ? $language : '');
-        $langs    = array();
-        preg_match('|^(?P<language_code>\w{2})?[-]?(?P<location>\w+)?|i', $language, $matches);
+        $language = (
+            true === isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])
+            ? $_SERVER['HTTP_ACCEPT_LANGUAGE']
+            : ''
+        );
+        $langs = array();
 
-        if (false === empty($matches['language_code'])) {
-            if (false === empty($matches['language_code'])) {
-                $langs[] = $matches['language_code']. '-' . $matches['location'];
+        if (false === empty($language)) {
+            $language = strtolower(false === empty($language) ? $language : '');
+
+            preg_match_all(
+                '|(?P<language_code>\w{2})[-]?(?P<location>\w+)?;?(?P<weight>q=0\.\d)?|i',
+                $language,
+                $matches
+            );
+
+            foreach ($matches['language_code'] as $i => $major_lang) {
+                if (false === empty($matches['location'][$i])) {
+                    $langs[] = $major_lang. '-' . $matches['location'][$i];
+                }
+
+                $langs[] = $major_lang;
             }
-
-            $langs[] = $matches['language_code'];
         }
 
-        return $langs;
+        return array_unique($langs);
     }
 
     /**
@@ -181,7 +193,7 @@ final class i18n
             $langs = array_merge($langs, call_user_func('self::' . $mapping_func[$key]));
         }
 
-        $intersect_langs = array_intersect($langs, $support_langs);
+        $intersect_langs = array_values(array_intersect($langs, $support_langs));
 
         if (false === empty($intersect_langs[0])) {
             $active_language = $intersect_langs[0];
