@@ -26,8 +26,8 @@ class HttpResponse
     /**
      * json - echo json
      *
-     * @param string $html     - html
-     * @param bool   $is_jsonp - is jsonp
+     * @param object|array $obj      - object wants to be convert into json
+     * @param bool         $is_jsonp - is jsonp
      *
      * @return null
      */
